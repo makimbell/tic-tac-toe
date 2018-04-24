@@ -29,10 +29,18 @@
   <!-- JavaScript -->
   <script>
 	var turn="X";
+	var board_size = 3; <!-- In case we wanted to make this flexible -->
+	var board = initBoardData(board_size);
 	function squareClick(id) {
-		alert(id + " clicked by " + turn);
+		
 		<!-- Do all tic tac toe logic here. -->
 		<!-- * Check to see if square is empty -->
+		var isOpenSquare = checkOpenSquare(id)
+		if (isOpenSquare != true) {
+			<!-- this square isn't empty, shout about it -->
+			alert(id + " is not empty! " + turn + " tried to cheat!");
+			return;
+		}
 		
 		<!-- * If empty, put X or O in square depending on whose turn it is -->
 		document.getElementById(id).innerHTML = turn;
@@ -40,12 +48,44 @@
 		<!-- * Check for winner based on location of X and O squares -->
 		
 		
-		<!-- * Switch to other player -->
+		<!-- * Fill board data and Switch to other player -->
+		fillBoardData(id,turn)
 		if(turn==="X"){
 			turn="O";
 		} else {
 			turn="X";
 		}
+	}
+	
+	function resetGame() {
+		alert("I haven't been told what to do here!");
+	}
+	
+	function initBoardData(s) {
+		var board_data = [];
+		for (i = 0;i<s*s; i++) {
+			board_data.push(NaN);
+		}
+		return board_data;
+	}
+	
+	function getIndexFromID(id) {
+		var match_str = /\d+/.exec(id);
+		return match_str - 1;
+	}
+	
+	function checkOpenSquare(id) {
+		var idx = getIndexFromID(id);
+		return isNaN(board[idx]);
+	}
+	
+	function fillBoardData(id,t) {
+		var idx = getIndexFromID(id);
+		var fillVal = 0;
+		if (t == "O") {
+			fillVal -= 1;
+		}
+		board[idx] = fillVal;
 	}
 	
   </script>
@@ -77,6 +117,8 @@
 			<td><div id="box9" onclick="squareClick(id)">box9</div></td>		
 		</tr>		
 	</table>
+	
+	<button onclick="resetGame()">Reset</button>
 </body>
 
 
