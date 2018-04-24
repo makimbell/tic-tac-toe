@@ -1,6 +1,8 @@
 <!DOCTYPE HTML>
 <html lang = "en">
 
+<!-- CSS -->
+<!-- You can take out each of these to see what they do -->
 <style>
 	table {
 		border-collapse: collapse;
@@ -31,11 +33,14 @@
 		alert(id + " clicked by " + turn);
 		<!-- Do all tic tac toe logic here. -->
 		<!-- * Check to see if square is empty -->
+		
 		<!-- * If empty, put X or O in square depending on whose turn it is -->
+		document.getElementById(id).innerHTML = turn;
+		
 		<!-- * Check for winner based on location of X and O squares -->
 		
 		
-		<!-- * Switch to other players turn -->
+		<!-- * Switch to other player -->
 		if(turn==="X"){
 			turn="O";
 		} else {
@@ -48,6 +53,13 @@
 </head>
 
 <body>
+	<!-- This is the actual table being drawn -->
+	<!-- Each "tr" is a row. Each "td" is a square -->
+	<!-- The "div"s are just here to be clicked on and to contain the text -->
+	<!-- There might be a better way to do that part -->
+	<!-- When a div is clicked, it calls the JavaScript function "squareClick" defined at the top,
+	<!-- and it sends the id of the clicked div (since each div calls the same function, we need to know which one called it) -->
+	
 	<table>
 		<tr>
 			<td><div id="box1" onclick="squareClick(id)">box1</div></td>
