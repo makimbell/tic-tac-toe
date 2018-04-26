@@ -28,43 +28,54 @@
   
   <!-- JavaScript -->
   <script>
+	<!-- Initialize variables -->
 	var turn="X";
-	var board_size = 3; <!-- In case we wanted to make this flexible -->
+	var board_size = 3;
 	var board = initBoardData(board_size);
 	function squareClick(id) {
-		
-		<!-- Do all tic tac toe logic here. -->
-		<!-- * Check to see if square is empty -->
-		var isOpenSquare = checkOpenSquare(id)
-		if (isOpenSquare != true) {
-			<!-- this square isnt empty, shout about it -->
+	
+		<!-- Check to see if square is empty -->
+		if (checkOpenSquare(id) != true) {
 			alert(id + " is not empty! " + turn + " tried to cheat!");
 			return;
 		}
 		
-		<!-- * If empty, put X or O in square depending on whose turn it is -->
-		document.getElementById(id).innerHTML = turn;
+		<!-- Fill in the clicked square on board[] and UI -->
+		fillBoardData(id, turn);
 		
-		<!-- * Check for winner based on location of X and O squares -->
+		<!-- Check for winner based on location of X and O squares -->
+		checkForWinner();
 		
-		
-		<!-- * Fill board data and Switch to other player -->
-		fillBoardData(id,turn)
+		<!-- Switch to other player -->
 		if(turn==="X"){
 			turn="O";
 		} else {
 			turn="X";
 		}
+		
+		<!-- Update turn display -->
+		updateTurnDisplay();
 	}
 	
 	function resetGame() {
-		alert("I havent been told what to do here!");
+		<!-- Initialize board data back to NaN, clear UI board, set player turn to X -->
+		
+		board = initBoardData(board_size);
+		
+		for(i=0; i<(board_size*board_size); i++){
+			var squareId = "square"+(i+1);
+			document.getElementById(squareId).innerHTML = "";
+		}
+		
+		turn="X";
+		updateTurnDisplay();
 	}
 	
 	function initBoardData(s) {
+		<!-- Set all board data to NaN -->
 		var board_data = [];
 		for (i = 0;i<s*s; i++) {
-			board_data.push(NaN);
+			board_data[i] = NaN;
 		}
 		return board_data;
 	}
@@ -80,12 +91,31 @@
 	}
 	
 	function fillBoardData(id,t) {
+		<!-- Fill in board[] and UI based on turn and square clicked -->
 		var idx = getIndexFromID(id);
 		var fillVal = 0;
 		if (t == "O") {
 			fillVal -= 1;
 		}
 		board[idx] = fillVal;
+		
+		document.getElementById(id,t).innerHTML = t;
+		
+	}
+	
+	function updateTurnDisplay() {
+		document.getElementById("turnDisplay").innerHTML = turn + "'s Turn!";
+	}
+	
+	function checkForWinner() {
+	}
+	
+	function printBoardToConsole() {
+		console.log("-------------");
+		for(i=0; i<(board_size*board_size); i++){
+			console.log("board["+i+"] = " + board[i]);
+		}
+		console.log("-------------");
 	}
 	
   </script>
@@ -93,32 +123,30 @@
 </head>
 
 <body>
-	<!-- This is the actual table being drawn -->
-	<!-- Each "tr" is a row. Each "td" is a square -->
-	<!-- The "div"s are just here to be clicked on and to contain the text -->
-	<!-- There might be a better way to do that part -->
-	<!-- When a div is clicked, it calls the JavaScript function "squareClick" defined at the top,
-	<!-- and it sends the id of the clicked div (since each div calls the same function, we need to know which one called it) -->
+
+	<h1>Tic-Tac-Toe</h1>
+	<h2 id="turnDisplay">X's Turn!</h2>
 	
 	<table>
 		<tr>
-			<td><div id="box1" onclick="squareClick(id)">box1</div></td>
-			<td><div id="box2" onclick="squareClick(id)">box2</div></td>
-			<td><div id="box3" onclick="squareClick(id)">box3</div></td>		
+			<td><div id="square1" onclick="squareClick(id)">square1</div></td>
+			<td><div id="square2" onclick="squareClick(id)">square2</div></td>
+			<td><div id="square3" onclick="squareClick(id)">square3</div></td>		
 		</tr>
 		<tr>
-			<td><div id="box4" onclick="squareClick(id)">box4</div></td>
-			<td><div id="box5" onclick="squareClick(id)">box5</div></td>
-			<td><div id="box6" onclick="squareClick(id)">box6</div></td>		
+			<td><div id="square4" onclick="squareClick(id)">square4</div></td>
+			<td><div id="square5" onclick="squareClick(id)">square5</div></td>
+			<td><div id="square6" onclick="squareClick(id)">square6</div></td>		
 		</tr>
 		<tr>
-			<td><div id="box7" onclick="squareClick(id)">box7</div></td>
-			<td><div id="box8" onclick="squareClick(id)">box8</div></td>
-			<td><div id="box9" onclick="squareClick(id)">box9</div></td>		
+			<td><div id="square7" onclick="squareClick(id)">square7</div></td>
+			<td><div id="square8" onclick="squareClick(id)">square8</div></td>
+			<td><div id="square9" onclick="squareClick(id)">square9</div></td>		
 		</tr>		
 	</table>
 	
 	<button onclick="resetGame()">Reset</button>
+	<button onclick="printBoardToConsole()">Print board to console</button>
 </body>
 
 
