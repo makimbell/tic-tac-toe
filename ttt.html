@@ -11,7 +11,7 @@
 		border: 4px solid black;
 		text-align: center;
 		height: 100px;
-		width: 100px;
+		width: 100px
 	}
 	div {
 		height: 100%;
@@ -30,25 +30,28 @@
   <script>
 	<!-- Initialize variables -->
 	var turn="X";
-	var board_size = 3;
-	var board = initBoardData(board_size);
-	var lastMove = NaN
 	function squareClick(id) {
 	
-		<!-- Check to see if square is empty -->
-		if (checkOpenSquare(id) != true) {
-			alert(id + " is not empty! " + turn + " tried to cheat!");
+		<!-- First check for GAMEOVER state. If turn is GAMEOVER, do nothing -->
+		if (turn=="GAMEOVER"){
+			return;
+		}
+	
+		<!-- Check to see if square is empty. If it is, continue. If it is not, do nothing (return) -->
+		if (document.getElementById(id).innerHTML != "") {
 			return;
 		}
 		
-		<!-- Fill in the clicked square on board[] and UI -->
-		fillBoardData(id, turn);
+		<!-- Fill in UI based on turn and square clicked -->
+		document.getElementById(id, turn).innerHTML = turn;
 		
 		<!-- Check for winner based on location of X and O squares -->
 		checkForWinner();
 		
 		<!-- Switch to other player -->
-		if(turn==="X"){
+		if(turn=="GAMEOVER"){
+			turn="GAMEOVER";
+		} else if (turn == "X") {
 			turn="O";
 		} else {
 			turn="X";
@@ -59,11 +62,8 @@
 	}
 	
 	function resetGame() {
-		<!-- Initialize board data back to NaN, clear UI board, set player turn to X -->
-		
-		board = initBoardData(board_size);
-		
-		for(i=0; i<(board_size*board_size); i++){
+		<!-- Clear UI board, set player turn to X, and update turn display -->
+		for(i=0; i<(9); i++){
 			var squareId = "square"+(i+1);
 			document.getElementById(squareId).innerHTML = "";
 		}
@@ -72,160 +72,41 @@
 		updateTurnDisplay();
 	}
 	
-	function initBoardData(s) {
-		<!-- Set all board data to NaN -->
-		var board_data = [];
-		for (i = 0;i<s*s; i++) {
-			board_data[i] = NaN;
-		}
-		return board_data;
-	}
-	
-	function getIndexFromID(id) {
-		var match_str = /\d+/.exec(id);
-		return match_str - 1;
-	}
-	
-	function getLinearIndex(x,y) {
-		<!-- [0] is row, [1] is column. Convert to linear index in board array -->
-		return array_add(array_multiply(board_size,x),y);
-	}
-	
-	function getGridIndex(idx) {
-		<!-- get row, column. Convert from linear index to 2d coordinates -->
-		if (!Array.isArray(idx)) {
-			idx = [idx];
-		}
-		return [idx.map(function(x) {return Math.floor(x/board_size)}), idx.map(function(x) {return x%board_size;})];
-	}
-	
-	function checkRow(gidx) {
-		var rowidx = gidx[0];
-		var cols = []
-		for(i=0; i<board_size; i++){
-			cols[i] = i
-		}
-		var rows = array_multiply(ones(board_size),rowidx);
-		
-		var rowData = getLinearIndex(rows,cols).map(function(element) { return board[element]} );
-		return rowData.reduce(function(prev,x) { return prev+x});
-	}
-	
-	function checkCol(gidx) {
-		var colidx = gidx[1];
-		var rows = []
-		for(i=0; i<board_size; i++){
-			rows[i] = i
-		}
-		var cols = array_multiply(ones(board_size),colidx);
-		var colData = getLinearIndex(rows,cols).map(function(element) { return board[element]} );
-		return colData.reduce(function(prev,x) { return prev+x});
-	}
-	
-	function ones(L) {
-		<!-- get an array of all 1's -->
-		var X = [];
-		for (i= 0;i<L;i++) {
-			X[i] = 1
-		}
-		return X
-	}
-	
-	function array_multiply(a,b) {
-		var scalarFlag = [false, false];
-		if (!Array.isArray(a)) {
-			a = [a];
-		}
-		if (!Array.isArray(b)) {
-			b = [b];
-		}
-		
-		if (a.length != b.length && a.length != 1 && b.length != 1) {
-			throw "Arrays must be the same length!";
-		}
-		
-		if (a.length == 1) {
-			return b.map(function(x) { return x*a[0]; });
-		} else if (b.length == 1) {
-			return a.map(function(x) { return x*b[0]; });
-		} else {
-			return a.map(function(x,idx) { return x*b[idx]; });
-		}	
-	}
-	
-	function array_add(a,b) {
-		var scalarFlag = [false, false];
-		if (!Array.isArray(a)) {
-			a = [a];
-		}
-		if (!Array.isArray(b)) {
-			b = [b];
-		}
-		
-		if (a.length != b.length && a.length != 1 && b.length != 1) {
-			throw "Arrays must be the same length!";
-		}
-		
-		if (a.length == 1) {
-			return b.map(function(x) { return x+a[0]; });
-		} else if (b.length == 1) {
-			return a.map(function(x) { return x+b[0]; });
-		} else {
-			return a.map(function(x,idx) { return x+b[idx]; });
-		}	
-	}
-	
-	
-	
-	function checkOpenSquare(id) {
-		var idx = getIndexFromID(id);
-		return isNaN(board[idx]);
-	}
-	
-	function fillBoardData(id,t) {
-		<!-- Fill in board[] and UI based on turn and square clicked -->
-		var idx = getIndexFromID(id);
-		var fillVal = 0;
-		if (t == "O") {
-			fillVal = 1;
-		}
-		board[idx] = fillVal;
-		lastMove = getGridIndex(idx)
-		document.getElementById(id,t).innerHTML = t;
-		
-	}
-	
 	function updateTurnDisplay() {
-		document.getElementById("turnDisplay").innerHTML = turn + "'s Turn!";
+		<!-- Update turn display UI -->
+		document.getElementById("turnDisplay").innerHTML = turn;
 	}
 	
 	function checkForWinner() {
-		<!-- check position of last square and determine if it makes 3 in a row -->
-		var result = checkRow(lastMove);
-		if (result == 0) {
-			console.log("X is the winner!");
-			return
-		} else if (result == board_size) {
-			console.log("O is the winner!");
-			return
-		}
+		<!-- Check all rows, all columns, and both diagonals for a winner -->
+		<!-- Later, this can be improved a lot, but for now just check everything -->
 		
-		result = checkCol(lastMove);
-		if (result == 0) {
-			console.log("X is the winner!");
-			return
-		} else if (result == board_size) {
-			console.log("O is the winner!");
-			return
-		}
+		checkThreeSquares("square1","square2","square3");
+		checkThreeSquares("square4","square5","square6");
+		checkThreeSquares("square7","square8","square9");
+		
+		checkThreeSquares("square1","square4","square7");
+		checkThreeSquares("square2","square5","square8");
+		checkThreeSquares("square3","square6","square9");
+		
+		checkThreeSquares("square1","square5","square9");
+		checkThreeSquares("square3","square5","square7");
+		
 	}
 	
-	function printBoardToConsole() {
-		console.log("-------------");
-		for(i=0; i<(board_size*board_size); i++){
-			console.log("board["+i+"] = " + board[i]);
+	function checkThreeSquares(a,b,c) {
+		<!-- Pass in 3 square element IDs to be checked. If all three contain the same text, TRUE is returned !-->
+		var textA = document.getElementById(a).innerHTML;
+		var textB = document.getElementById(b).innerHTML;
+		var textC = document.getElementById(c).innerHTML;
+		
+		if(textA + textB + textC == "XXX") {
+			turn = "GAMEOVER";
+			console.log("X wins");
+		} else if (textA + textB + textC == "OOO") {
+			turn = "GAMEOVER";
+			console.log("O wins");
 		}
-		console.log("-------------");
 	}
 	
   </script>
@@ -239,24 +120,23 @@
 	
 	<table>
 		<tr>
-			<td><div id="square1" onclick="squareClick(id)">square1</div></td>
-			<td><div id="square2" onclick="squareClick(id)">square2</div></td>
-			<td><div id="square3" onclick="squareClick(id)">square3</div></td>		
+			<td><div id="square1" onclick="squareClick(id)"></div></td>
+			<td><div id="square2" onclick="squareClick(id)"></div></td>
+			<td><div id="square3" onclick="squareClick(id)"></div></td>		
 		</tr>
 		<tr>
-			<td><div id="square4" onclick="squareClick(id)">square4</div></td>
-			<td><div id="square5" onclick="squareClick(id)">square5</div></td>
-			<td><div id="square6" onclick="squareClick(id)">square6</div></td>		
+			<td><div id="square4" onclick="squareClick(id)"></div></td>
+			<td><div id="square5" onclick="squareClick(id)"></div></td>
+			<td><div id="square6" onclick="squareClick(id)"></div></td>		
 		</tr>
 		<tr>
-			<td><div id="square7" onclick="squareClick(id)">square7</div></td>
-			<td><div id="square8" onclick="squareClick(id)">square8</div></td>
-			<td><div id="square9" onclick="squareClick(id)">square9</div></td>		
+			<td><div id="square7" onclick="squareClick(id)"></div></td>
+			<td><div id="square8" onclick="squareClick(id)"></div></td>
+			<td><div id="square9" onclick="squareClick(id)"></div></td>		
 		</tr>		
 	</table>
 	
 	<button onclick="resetGame()">Reset</button>
-	<button onclick="printBoardToConsole()">Print board to console</button>
 </body>
 
 
